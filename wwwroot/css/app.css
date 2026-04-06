@@ -121,7 +121,7 @@ a,
     gap: 1.5rem;
     width: min(100%, 71rem);
     margin: 0 auto;
-    padding: 2.75rem 0 1rem;
+    padding: 2.5rem 0;
     grid-template-columns: repeat(3, minmax(0, 370px));
     justify-content: center;
     align-items: end;
