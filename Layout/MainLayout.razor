@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using Newtonsoft.Json
 @inject GroupTrackerStorageService StorageService
 @inject IJSRuntime JSRuntime
 <MudThemeProvider Theme="_theme" IsDarkMode="true" />
@@ -21,6 +22,8 @@
                                OnClick="@menu.ToggleAsync" />
             </ActivatorContent>
             <ChildContent>
+                <MudMenuItem OnClick="@ExportStateAsync">Export Data</MudMenuItem>
+                <MudMenuItem OnClick="@ImportStateAsync">Import Data</MudMenuItem>
                 <MudMenuItem OnClick="@ConfirmResetScoresAsync">Reset Scores</MudMenuItem>
             </ChildContent>
         </MudMenu>
@@ -59,6 +62,37 @@
         if (confirmed)
         {
             await StorageService.ResetAllScoresAsync();
+        }
+    }
+
+    private async Task ExportStateAsync()
+    {
+        var payload = await StorageService.ExportStateAsync();
+        await JSRuntime.InvokeVoidAsync(
+            "groupTrackerFiles.downloadJson",
+            "group_tracker.json",
+            payload);
+    }
+
+    private async Task ImportStateAsync()
+    {
+        var payload = await JSRuntime.InvokeAsync<string?>("groupTrackerFiles.pickJsonFile");
+        if (string.IsNullOrWhiteSpace(payload))
+        {
+            return;
+        }
+
+        try
+        {
+            var imported = await StorageService.ImportStateAsync(payload);
+            if (!imported)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "The selected file does not contain valid group tracker data.");
+            }
+        }
+        catch (JsonException)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "The selected file is not valid JSON.");
         }
     }
 }

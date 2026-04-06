@@ -74,6 +74,40 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
         await PersistAsync();
     }
 
+    public async Task<string> ExportStateAsync()
+    {
+        var state = await GetStateAsync();
+        return JsonConvert.SerializeObject(state, SerializerSettings);
+    }
+
+    public async Task<bool> ImportStateAsync(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return false;
+        }
+
+        var importedState = JsonConvert.DeserializeObject<GroupTrackerState>(json);
+        if (importedState?.Groups is null)
+        {
+            return false;
+        }
+
+        foreach (var group in importedState.Groups)
+        {
+            group.Id = group.Id == Guid.Empty ? Guid.NewGuid() : group.Id;
+            group.Name = group.Name?.Trim() ?? string.Empty;
+            group.PlayerNames = group.PlayerNames?
+                .Where(player => !string.IsNullOrWhiteSpace(player))
+                .Select(player => player.Trim())
+                .ToList() ?? [];
+        }
+
+        _state = importedState;
+        await PersistAsync();
+        return true;
+    }
+
     private async Task PersistAsync(bool notifyStateChanged = true)
     {
         if (_state is null)
