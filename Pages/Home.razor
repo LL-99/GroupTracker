@@ -1,10 +1,95 @@
 ﻿@page "/"
+@inject GroupTrackerStorageService StorageService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Group Tracker</PageTitle>
 
-<MudStack Spacing="3">
-    <MudText Typo="Typo.h3">Hello, world!</MudText>
-    <MudText Typo="Typo.body1">
-        Welcome to your new app.
-    </MudText>
-</MudStack>
+@if (topGroups.Count == 0)
+{
+    <MudPaper Class="empty-state pa-8">
+        <MudText Typo="Typo.h4">No groups available</MudText>
+        <MudText Typo="Typo.body1">Add groups to the stored tracker state to populate the podium.</MudText>
+    </MudPaper>
+}
+else
+{
+    <section class="hero-panel">
+        <MudText Typo="Typo.overline" Class="hero-kicker">Scoreboard</MudText>
+        <MudText Typo="Typo.h2" Class="hero-title">Top Groups</MudText>
+        <MudText Typo="Typo.body1" Class="hero-copy">
+            Scores are persisted in your browser's local storage and restored on reload.
+        </MudText>
+    </section>
+
+    <section class="podium-grid">
+        @foreach (var group in topGroups.Select((entry, index) => new PodiumSlot(entry, index + 1)))
+        {
+            <MudPaper Class="@GetPodiumCardClass(group.Place)">
+                <MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Place)</MudText>
+                <MudText Typo="Typo.h4" Class="podium-group-name">@group.Group.Name</MudText>
+                <MudText Typo="Typo.h3" Class="podium-score">@group.Group.TotalScore pts</MudText>
+                <MudChipSet T="string" AllClosable="false" Class="player-chip-list">
+                    @foreach (var player in group.Group.PlayerNames)
+                    {
+                        <MudChip T="string" Class="player-chip">@player</MudChip>
+                    }
+                </MudChipSet>
+                <div class="score-actions">
+                    @foreach (var delta in scoreButtons)
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Class="score-button"
+                                   OnClick="@(() => AdjustScoreAsync(group.Group.Id, delta))">
+                            @FormatDelta(delta)
+                        </MudButton>
+                    }
+                </div>
+            </MudPaper>
+        }
+    </section>
+}
+
+@code {
+    private readonly int[] scoreButtons = [-5, -1, 1, 5];
+    private List<GroupEntry> topGroups = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroupsAsync();
+    }
+
+    private async Task AdjustScoreAsync(Guid groupId, int delta)
+    {
+        await StorageService.UpdateScoreAsync(groupId, delta);
+        await LoadGroupsAsync();
+    }
+
+    private async Task LoadGroupsAsync()
+    {
+        var state = await StorageService.GetStateAsync();
+        topGroups = state.Groups
+            .OrderByDescending(group => group.TotalScore)
+            .ThenBy(group => group.Name)
+            .Take(3)
+            .ToList();
+    }
+
+    private static string GetPlaceLabel(int place) => place switch
+    {
+        1 => "1st Place",
+        2 => "2nd Place",
+        3 => "3rd Place",
+        _ => $"{place}th Place"
+    };
+
+    private static string GetPodiumCardClass(int place) => place switch
+    {
+        1 => "podium-card podium-gold",
+        2 => "podium-card podium-silver",
+        3 => "podium-card podium-bronze",
+        _ => "podium-card"
+    };
+
+    private static string FormatDelta(int delta) => delta > 0 ? $"+{delta}" : delta.ToString();
+
+    private sealed record PodiumSlot(GroupEntry Group, int Place);
+}

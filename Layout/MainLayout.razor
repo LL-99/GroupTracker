@@ -1,29 +1,24 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider IsDarkMode="true" />
+<MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="0" Class="tracker-appbar">
         <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="ToggleDrawer">
             Menu
         </MudButton>
-        <MudText Typo="Typo.h6">GroupTracker</MudText>
+        <MudText Typo="Typo.h6">Group Tracker</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Text"
-                   Color="Color.Inherit"
-                   Href="https://learn.microsoft.com/aspnet/core/"
-                   Target="_blank">
-            About
-        </MudButton>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Warning">Live Scores</MudChip>
     </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Variant="DrawerVariant.Responsive">
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="0" Variant="DrawerVariant.Responsive" Class="tracker-drawer">
         <NavMenu />
     </MudDrawer>
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+        <MudContainer MaxWidth="MaxWidth.False" Class="tracker-shell">
             @Body
         </MudContainer>
     </MudMainContent>

@@ -1,0 +1,14 @@
+.tracker-appbar {
+    backdrop-filter: blur(18px);
+    background: linear-gradient(135deg, rgba(9, 30, 66, 0.94), rgba(28, 78, 128, 0.9));
+    color: #f8fbff;
+}
+
+.tracker-drawer {
+    background: rgba(246, 250, 255, 0.95);
+}
+
+.tracker-shell {
+    min-height: calc(100vh - 64px);
+    padding: 2rem 1.25rem 3rem;
+}

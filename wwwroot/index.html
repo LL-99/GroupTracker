@@ -27,6 +27,16 @@
             }
         }(window.location));
     </script>
+    <script>
+        window.groupTrackerStorage = {
+            get: function (key) {
+                return window.localStorage.getItem(key);
+            },
+            set: function (key, value) {
+                window.localStorage.setItem(key, value);
+            }
+        };
+    </script>
 </head>
 
 <body>
