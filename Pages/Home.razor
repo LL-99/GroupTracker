@@ -78,15 +78,18 @@ else
 						}
 					</MudChipSet>
 				}
-				<div class="score-actions">
-					@foreach (var delta in scoreButtons)
-					{
-						<MudButton Variant="Variant.Filled"
-								   Class="score-button"
-								   OnClick="@(() => AdjustScoreAsync(group.Group.Id, delta))">
-							@FormatDelta(delta)
-						</MudButton>
-					}
+				<div class="score-panel">
+					<MudText Typo="Typo.caption" Class="score-panel-label">Adjust score</MudText>
+					<div class="score-actions">
+						@foreach (var delta in scoreButtons)
+						{
+							<MudButton Variant="Variant.Filled"
+									   Class="@GetScoreButtonClass(delta)"
+									   OnClick="@(() => AdjustScoreAsync(group.Group.Id, delta))">
+								@FormatDelta(delta)
+							</MudButton>
+						}
+					</div>
 				</div>
 			</MudPaper>
 		}
@@ -94,7 +97,7 @@ else
 }
 
 @code {
-	private readonly int[] scoreButtons = [-5, -1, 1, 5];
+	private readonly int[] scoreButtons = [-1, 1, -5, 5];
 	private List<GroupEntry> topGroups = [];
 	private Guid? editingGroupId;
 	private string editGroupName = string.Empty;
@@ -208,6 +211,13 @@ else
 		2 => "podium-card podium-silver podium-second",
 		3 => "podium-card podium-bronze podium-third",
 		_ => "podium-card"
+	};
+
+	private static string GetScoreButtonClass(int delta) => delta switch
+	{
+		< 0 => "score-button score-button-negative",
+		> 0 => "score-button score-button-positive",
+		_ => "score-button"
 	};
 
 	private static string FormatDelta(int delta) => delta > 0 ? $"+{delta}" : delta.ToString();
