@@ -12,14 +12,6 @@
 }
 else
 {
-    <section class="hero-panel">
-        <MudText Typo="Typo.overline" Class="hero-kicker">Scoreboard</MudText>
-        <MudText Typo="Typo.h2" Class="hero-title">Top Groups</MudText>
-        <MudText Typo="Typo.body1" Class="hero-copy">
-            Scores are persisted in your browser's local storage and restored on reload.
-        </MudText>
-    </section>
-
     <section class="podium-grid">
         @foreach (var group in GetPodiumSlots())
         {

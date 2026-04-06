@@ -8,6 +8,8 @@ h1:focus {
     --tracker-panel-strong: rgba(11, 20, 34, 0.98);
     --tracker-text: #eff5ff;
     --tracker-muted: #97a9c1;
+    --tracker-heading: #f7fbff;
+    --tracker-score: #ffffff;
     --tracker-gold: #f0bf4c;
     --tracker-silver: #b7c4d3;
     --tracker-bronze: #d39063;
@@ -114,36 +116,11 @@ a,
         content: var(--blazor-load-percentage-text, "Loading");
     }
 
-.hero-panel {
-    max-width: 48rem;
-    margin: 0 auto 2rem;
-    padding: 2rem;
-    border: 1px solid rgba(151, 169, 193, 0.14);
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba(17, 30, 49, 0.96), rgba(11, 20, 34, 0.92));
-    box-shadow: var(--tracker-shadow);
-}
-
-.hero-kicker {
-    color: var(--tracker-muted);
-    letter-spacing: 0.16rem;
-}
-
-.hero-title {
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-}
-
-.hero-copy {
-    max-width: 36rem;
-    color: var(--tracker-muted);
-}
-
 .podium-grid {
     display: grid;
     gap: 1.5rem;
     width: min(100%, 71rem);
-    margin: 0 auto;
+    margin: 1rem auto 0;
     grid-template-columns: repeat(3, minmax(0, 370px));
     justify-content: center;
     align-items: end;
@@ -196,11 +173,41 @@ a,
 }
 
 .podium-group-name {
+    color: var(--tracker-heading);
     font-weight: 750;
+    line-height: 1.15;
+    text-wrap: balance;
 }
 
 .podium-score {
+    color: var(--tracker-score);
     font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.28);
+}
+
+.podium-gold .podium-group-name {
+    color: #fff4cf;
+}
+
+.podium-gold .podium-score {
+    color: #ffd978;
+}
+
+.podium-silver .podium-group-name {
+    color: #f4f8ff;
+}
+
+.podium-silver .podium-score {
+    color: #e8f0ff;
+}
+
+.podium-bronze .podium-group-name {
+    color: #ffe7d7;
+}
+
+.podium-bronze .podium-score {
+    color: #ffd1b3;
 }
 
 .player-chip-list {
@@ -253,10 +260,6 @@ a,
 }
 
 @media (max-width: 600px) {
-    .hero-panel {
-        padding: 1.5rem;
-    }
-
     .score-actions {
         grid-template-columns: 1fr;
     }
