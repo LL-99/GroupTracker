@@ -1,10 +1,11 @@
 ﻿@page "/"
 @inject GroupTrackerStorageService StorageService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <PageTitle>Group Tracker</PageTitle>
 
-@if (topGroups.Count == 0)
+@if (groups.Count == 0)
 {
 	<MudPaper Class="empty-state pa-8">
 		<MudText Typo="Typo.h4">No groups available</MudText>
@@ -96,9 +97,25 @@ else
 	</section>
 }
 
+<MudPaper Class="group-count-control" Elevation="6">
+	<MudText Typo="Typo.caption" Class="group-count-label">Groups</MudText>
+	<div class="group-count-actions">
+		<MudIconButton Icon="@Icons.Material.Filled.Remove"
+					   Size="Size.Small"
+					   Disabled="@(groups.Count <= 1)"
+					   Class="group-count-button"
+					   OnClick="@RemoveGroupAsync" />
+		<MudText Typo="Typo.subtitle2" Class="group-count-value">@groups.Count</MudText>
+		<MudIconButton Icon="@Icons.Material.Filled.Add"
+					   Size="Size.Small"
+					   Class="group-count-button"
+					   OnClick="@AddGroupAsync" />
+	</div>
+</MudPaper>
+
 @code {
 	private readonly int[] scoreButtons = [-1, 1, -5, 5];
-	private List<GroupEntry> topGroups = [];
+	private List<GroupEntry> groups = [];
 	private Guid? editingGroupId;
 	private string editGroupName = string.Empty;
 	private string editGroupMembers = string.Empty;
@@ -121,6 +138,36 @@ else
 	private async Task AdjustScoreAsync(Guid groupId, int delta)
 	{
 		await StorageService.UpdateScoreAsync(groupId, delta);
+		await LoadGroupsAsync();
+	}
+
+	private async Task AddGroupAsync()
+	{
+		await StorageService.AddGroupAsync();
+		await LoadGroupsAsync();
+	}
+
+	private async Task RemoveGroupAsync()
+	{
+		if (groups.Count <= 1)
+		{
+			return;
+		}
+
+		var groupToRemove = groups[^1];
+		if (groupToRemove.TotalScore != 0)
+		{
+			var confirmed = await JSRuntime.InvokeAsync<bool>(
+				"confirm",
+				$"Remove {groupToRemove.Name}? Its score is {groupToRemove.TotalScore} and this cannot be undone.");
+
+			if (!confirmed)
+			{
+				return;
+			}
+		}
+
+		await StorageService.RemoveGroupAsync(groupToRemove.Id);
 		await LoadGroupsAsync();
 	}
 
@@ -173,20 +220,24 @@ else
 	private async Task LoadGroupsAsync()
 	{
 		var state = await StorageService.GetStateAsync();
-		topGroups = state.Groups
+		groups = state.Groups
 			.OrderByDescending(group => group.TotalScore)
 			.ThenBy(group => group.Name)
-			.Take(3)
 			.ToList();
+
+		if (editingGroupId is Guid groupId && groups.All(group => group.Id != groupId))
+		{
+			CancelEdit();
+		}
 	}
 
 	private List<PodiumSlot> GetPodiumSlots()
 	{
-		var slots = new List<PodiumSlot>(topGroups.Count);
+		var slots = new List<PodiumSlot>(groups.Count);
 		var currentRank = 0;
 		int? previousScore = null;
 
-		foreach (var entry in topGroups)
+		foreach (var entry in groups)
 		{
 			if (previousScore != entry.TotalScore)
 			{

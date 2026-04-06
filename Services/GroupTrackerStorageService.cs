@@ -29,6 +29,7 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
             ? GroupTrackerState.CreateDefault()
             : JsonConvert.DeserializeObject<GroupTrackerState>(rawState) ?? GroupTrackerState.CreateDefault();
 
+        NormalizeState(_state);
         await PersistAsync(notifyStateChanged: false);
         return _state;
     }
@@ -74,6 +75,44 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
         await PersistAsync();
     }
 
+    public async Task AddGroupAsync()
+    {
+        var state = await GetStateAsync();
+        var nextGroupNumber = state.Groups.Count + 1;
+        var firstPlayerNumber = ((nextGroupNumber - 1) * 2) + 1;
+
+        state.Groups.Add(new GroupEntry
+        {
+            Name = $"Group {nextGroupNumber}",
+            PlayerNames =
+            [
+                $"Player {firstPlayerNumber}",
+                $"Player {firstPlayerNumber + 1}"
+            ]
+        });
+
+        await PersistAsync();
+    }
+
+    public async Task<bool> RemoveGroupAsync(Guid groupId)
+    {
+        var state = await GetStateAsync();
+        if (state.Groups.Count <= 1)
+        {
+            return false;
+        }
+
+        var removed = state.Groups.RemoveAll(group => group.Id == groupId) > 0;
+        if (!removed)
+        {
+            return false;
+        }
+
+        NormalizeState(state);
+        await PersistAsync();
+        return true;
+    }
+
     public async Task<string> ExportStateAsync()
     {
         var state = await GetStateAsync();
@@ -103,9 +142,34 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
                 .ToList() ?? [];
         }
 
+        NormalizeState(importedState);
         _state = importedState;
         await PersistAsync();
         return true;
+    }
+
+    private static void NormalizeState(GroupTrackerState state)
+    {
+        state.Groups ??= [];
+
+        if (state.Groups.Count == 0)
+        {
+            state.Groups.Add(new GroupEntry
+            {
+                Name = "Group 1",
+                PlayerNames = ["Player 1", "Player 2"]
+            });
+        }
+
+        foreach (var group in state.Groups)
+        {
+            group.Id = group.Id == Guid.Empty ? Guid.NewGuid() : group.Id;
+            group.Name = string.IsNullOrWhiteSpace(group.Name) ? "Unnamed Group" : group.Name.Trim();
+            group.PlayerNames = group.PlayerNames
+                .Where(player => !string.IsNullOrWhiteSpace(player))
+                .Select(player => player.Trim())
+                .ToList();
+        }
     }
 
     private async Task PersistAsync(bool notifyStateChanged = true)

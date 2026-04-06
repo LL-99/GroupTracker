@@ -26,12 +26,6 @@ public sealed class GroupTrackerState
                     Name = "Group C",
                     PlayerNames = ["Player 5", "Player 6"],
                     TotalScore = 0
-                },
-                new GroupEntry
-                {
-                    Name = "Group D",
-                    PlayerNames = ["Player 7", "Player 8"],
-                    TotalScore = 0
                 }
             ]
         };
