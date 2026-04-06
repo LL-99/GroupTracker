@@ -17,15 +17,66 @@ else
 		@foreach (var group in GetPodiumSlots())
 		{
 			<MudPaper Class="@GetPodiumCardClass(group.Place)">
-				<MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Place)</MudText>
-				<MudText Typo="Typo.h4" Class="podium-group-name">@group.Group.Name</MudText>
+				<div class="podium-card-header">
+					<MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Place)</MudText>
+					<div class="podium-card-header-actions">
+						@if (editingGroupId == group.Group.Id)
+						{
+							<MudIconButton Icon="@Icons.Material.Filled.Check"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@SaveGroupEditsAsync" />
+							<MudIconButton Icon="@Icons.Material.Filled.Close"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@CancelEdit" />
+						}
+						else
+						{
+							<MudIconButton Icon="@Icons.Material.Filled.Edit"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@(() => StartEdit(group.Group))" />
+						}
+					</div>
+				</div>
+				@if (editingGroupId == group.Group.Id)
+				{
+					<MudTextField T="string"
+								  Value="@editGroupName"
+								  ValueChanged="@OnEditGroupNameChanged"
+								  Variant="Variant.Outlined"
+								  Margin="Margin.Dense"
+								  Class="podium-inline-input"
+								  Placeholder="Group name" />
+				}
+				else
+				{
+					<MudText Typo="Typo.h4" Class="podium-group-name">@group.Group.Name</MudText>
+				}
 				<MudText Typo="Typo.h3" Class="podium-score">@group.Group.TotalScore pts</MudText>
-				<MudChipSet T="string" AllClosable="false" Class="player-chip-list">
-					@foreach (var player in group.Group.PlayerNames)
-					{
-						<MudChip T="string" Class="player-chip">@player</MudChip>
-					}
-				</MudChipSet>
+				@if (editingGroupId == group.Group.Id)
+				{
+					<MudTextField T="string"
+								  Value="@editGroupMembers"
+								  ValueChanged="@OnEditGroupMembersChanged"
+								  Variant="Variant.Outlined"
+								  Margin="Margin.Dense"
+								  Class="podium-inline-input"
+								  Placeholder="Members, comma, separated" />
+				}
+				else
+				{
+					<MudChipSet T="string" AllClosable="false" Class="player-chip-list">
+						@foreach (var player in group.Group.PlayerNames)
+						{
+							<MudChip T="string" Class="player-chip">@player</MudChip>
+						}
+					</MudChipSet>
+				}
 				<div class="score-actions">
 					@foreach (var delta in scoreButtons)
 					{
@@ -44,6 +95,9 @@ else
 @code {
 	private readonly int[] scoreButtons = [-5, -1, 1, 5];
 	private List<GroupEntry> topGroups = [];
+	private Guid? editingGroupId;
+	private string editGroupName = string.Empty;
+	private string editGroupMembers = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -54,6 +108,52 @@ else
 	{
 		await StorageService.UpdateScoreAsync(groupId, delta);
 		await LoadGroupsAsync();
+	}
+
+	private void StartEdit(GroupEntry group)
+	{
+		editingGroupId = group.Id;
+		editGroupName = group.Name;
+		editGroupMembers = string.Join(", ", group.PlayerNames);
+	}
+
+	private void CancelEdit()
+	{
+		editingGroupId = null;
+		editGroupName = string.Empty;
+		editGroupMembers = string.Empty;
+	}
+
+	private async Task SaveGroupEditsAsync()
+	{
+		if (editingGroupId is not Guid groupId)
+		{
+			return;
+		}
+
+		var trimmedName = editGroupName.Trim();
+		if (string.IsNullOrWhiteSpace(trimmedName))
+		{
+			return;
+		}
+
+		var playerNames = editGroupMembers
+			.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+			.ToList();
+
+		await StorageService.UpdateGroupAsync(groupId, trimmedName, playerNames);
+		await LoadGroupsAsync();
+		CancelEdit();
+	}
+
+	private void OnEditGroupNameChanged(string value)
+	{
+		editGroupName = value;
+	}
+
+	private void OnEditGroupMembersChanged(string value)
+	{
+		editGroupMembers = value;
 	}
 
 	private async Task LoadGroupsAsync()

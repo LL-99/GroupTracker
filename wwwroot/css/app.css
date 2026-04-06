@@ -174,11 +174,36 @@ a,
     letter-spacing: 0.14rem;
 }
 
+.podium-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.podium-card-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.podium-edit-button {
+    color: var(--tracker-muted);
+}
+
 .podium-group-name {
     color: var(--tracker-heading);
     font-weight: 750;
     line-height: 1.15;
     text-wrap: balance;
+}
+
+.podium-inline-input .mud-input-slot {
+    color: var(--tracker-text);
+}
+
+.podium-inline-input .mud-input-outlined {
+    color: var(--tracker-text);
 }
 
 .podium-score {

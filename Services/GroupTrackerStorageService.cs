@@ -45,6 +45,21 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
         await PersistAsync();
     }
 
+    public async Task UpdateGroupAsync(Guid groupId, string name, IReadOnlyCollection<string> playerNames)
+    {
+        var state = await GetStateAsync();
+        var group = state.Groups.FirstOrDefault(entry => entry.Id == groupId);
+
+        if (group is null)
+        {
+            return;
+        }
+
+        group.Name = name;
+        group.PlayerNames = playerNames.ToList();
+        await PersistAsync();
+    }
+
     private async Task PersistAsync()
     {
         if (_state is null)
