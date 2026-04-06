@@ -11,27 +11,27 @@ public sealed class GroupTrackerState
             [
                 new GroupEntry
                 {
-                    Name = "Crimson Comets",
-                    PlayerNames = ["Ava", "Noah", "Mila", "Leon"],
-                    TotalScore = 42
+                    Name = "Group A",
+                    PlayerNames = ["Player 1", "Player 2"],
+                    TotalScore = 0
                 },
                 new GroupEntry
                 {
-                    Name = "Blue Phoenix",
-                    PlayerNames = ["Emma", "Luca", "Sofia", "Finn"],
-                    TotalScore = 39
+                    Name = "Group B",
+                    PlayerNames = ["Player 3", "Player 4"],
+                    TotalScore = 0
                 },
                 new GroupEntry
                 {
-                    Name = "Emerald Wolves",
-                    PlayerNames = ["Mia", "Ben", "Ella", "Jonas"],
-                    TotalScore = 34
+                    Name = "Group C",
+                    PlayerNames = ["Player 5", "Player 6"],
+                    TotalScore = 0
                 },
                 new GroupEntry
                 {
-                    Name = "Amber Arrows",
-                    PlayerNames = ["Lina", "Theo", "Nora", "Paul"],
-                    TotalScore = 27
+                    Name = "Group D",
+                    PlayerNames = ["Player 7", "Player 8"],
+                    TotalScore = 0
                 }
             ]
         };

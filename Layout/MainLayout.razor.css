@@ -8,6 +8,14 @@
     color: #f8fbff;
 }
 
+.tracker-options-menu {
+    color: inherit;
+}
+
+.tracker-options-button {
+    color: inherit;
+}
+
 .tracker-main {
     min-height: calc(100vh - 64px);
     display: flex;

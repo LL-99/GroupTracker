@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject GroupTrackerStorageService StorageService
+@implements IDisposable
 
 <PageTitle>Group Tracker</PageTitle>
 
@@ -102,6 +103,16 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadGroupsAsync();
+		StorageService.StateChanged += OnStorageStateChanged;
+	}
+
+	private void OnStorageStateChanged()
+	{
+		_ = InvokeAsync(async () =>
+		{
+			await LoadGroupsAsync();
+			StateHasChanged();
+		});
 	}
 
 	private async Task AdjustScoreAsync(Guid groupId, int delta)
@@ -202,4 +213,9 @@ else
 	private static string FormatDelta(int delta) => delta > 0 ? $"+{delta}" : delta.ToString();
 
 	private sealed record PodiumSlot(GroupEntry Group, int Place);
+
+	public void Dispose()
+	{
+		StorageService.StateChanged -= OnStorageStateChanged;
+	}
 }

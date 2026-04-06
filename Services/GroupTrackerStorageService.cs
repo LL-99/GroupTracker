@@ -14,6 +14,8 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
 
     private GroupTrackerState? _state;
 
+    public event Action? StateChanged;
+
     public async Task<GroupTrackerState> GetStateAsync()
     {
         if (_state is not null)
@@ -27,7 +29,7 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
             ? GroupTrackerState.CreateDefault()
             : JsonConvert.DeserializeObject<GroupTrackerState>(rawState) ?? GroupTrackerState.CreateDefault();
 
-        await PersistAsync();
+        await PersistAsync(notifyStateChanged: false);
         return _state;
     }
 
@@ -60,7 +62,19 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
         await PersistAsync();
     }
 
-    private async Task PersistAsync()
+    public async Task ResetAllScoresAsync()
+    {
+        var state = await GetStateAsync();
+
+        foreach (var group in state.Groups)
+        {
+            group.TotalScore = 0;
+        }
+
+        await PersistAsync();
+    }
+
+    private async Task PersistAsync(bool notifyStateChanged = true)
     {
         if (_state is null)
         {
@@ -69,5 +83,10 @@ public sealed class GroupTrackerStorageService(IJSRuntime jsRuntime)
 
         var payload = JsonConvert.SerializeObject(_state, SerializerSettings);
         await jsRuntime.InvokeVoidAsync("groupTrackerStorage.set", StorageKey, payload);
+
+        if (notifyStateChanged)
+        {
+            StateChanged?.Invoke();
+        }
     }
 }
