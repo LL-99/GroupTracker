@@ -136,20 +136,35 @@ a,
 .podium-grid {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    align-items: stretch;
+    grid-template-columns: repeat(3, minmax(0, 320px));
+    justify-content: center;
+    align-items: end;
 }
 
 .podium-card {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
     min-height: 24rem;
     padding: 1.5rem;
     border: 3px solid transparent;
     border-radius: 26px;
     background: var(--tracker-panel);
     box-shadow: var(--tracker-shadow);
+}
+
+.podium-first {
+    min-height: 28rem;
+    transform: translateY(-2.5rem);
+}
+
+.podium-second {
+    min-height: 24rem;
+}
+
+.podium-third {
+    min-height: 22rem;
 }
 
 .podium-gold {
@@ -210,6 +225,19 @@ a,
     margin: 5rem auto;
     border-radius: 28px;
     text-align: center;
+}
+
+@media (max-width: 960px) {
+    .podium-grid {
+        grid-template-columns: minmax(0, 420px);
+    }
+
+    .podium-first,
+    .podium-second,
+    .podium-third {
+        min-height: 24rem;
+        transform: none;
+    }
 }
 
 @media (max-width: 600px) {

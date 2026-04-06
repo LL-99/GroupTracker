@@ -21,7 +21,7 @@ else
     </section>
 
     <section class="podium-grid">
-        @foreach (var group in topGroups.Select((entry, index) => new PodiumSlot(entry, index + 1)))
+        @foreach (var group in GetPodiumSlots())
         {
             <MudPaper Class="@GetPodiumCardClass(group.Place)">
                 <MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Place)</MudText>
@@ -73,6 +73,23 @@ else
             .ToList();
     }
 
+    private List<PodiumSlot> GetPodiumSlots()
+    {
+        var slots = topGroups
+            .Select((entry, index) => new PodiumSlot(entry, index + 1))
+            .ToList();
+
+        return slots
+            .OrderBy(slot => slot.Place switch
+            {
+                2 => 0,
+                1 => 1,
+                3 => 2,
+                _ => slot.Place
+            })
+            .ToList();
+    }
+
     private static string GetPlaceLabel(int place) => place switch
     {
         1 => "1st Place",
@@ -83,9 +100,9 @@ else
 
     private static string GetPodiumCardClass(int place) => place switch
     {
-        1 => "podium-card podium-gold",
-        2 => "podium-card podium-silver",
-        3 => "podium-card podium-bronze",
+        1 => "podium-card podium-gold podium-first",
+        2 => "podium-card podium-silver podium-second",
+        3 => "podium-card podium-bronze podium-third",
         _ => "podium-card"
     };
 
