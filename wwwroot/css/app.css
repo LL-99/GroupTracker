@@ -3,27 +3,33 @@ h1:focus {
 }
 
 :root {
-    --tracker-bg: #eef4fb;
-    --tracker-panel: rgba(255, 255, 255, 0.9);
-    --tracker-text: #132238;
-    --tracker-muted: #5f6f86;
-    --tracker-gold: #d4a017;
-    --tracker-silver: #90a4b8;
-    --tracker-bronze: #b86b3f;
-    --tracker-shadow: 0 22px 60px rgba(17, 37, 63, 0.14);
+    --tracker-bg: #08111f;
+    --tracker-panel: rgba(15, 26, 43, 0.94);
+    --tracker-panel-strong: rgba(11, 20, 34, 0.98);
+    --tracker-text: #eff5ff;
+    --tracker-muted: #97a9c1;
+    --tracker-gold: #f0bf4c;
+    --tracker-silver: #b7c4d3;
+    --tracker-bronze: #d39063;
+    --tracker-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
 }
 
 html,
 body {
     background:
-        radial-gradient(circle at top, rgba(255, 220, 135, 0.28), transparent 30%),
-        linear-gradient(180deg, #f8fbff 0%, var(--tracker-bg) 100%);
+        radial-gradient(circle at top, rgba(100, 181, 246, 0.16), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(240, 191, 76, 0.1), transparent 24%),
+        linear-gradient(180deg, #0b1423 0%, var(--tracker-bg) 100%);
     color: var(--tracker-text);
     font-family: "Segoe UI", "Inter", sans-serif;
 }
 
 body {
     margin: 0;
+}
+
+#app {
+    min-height: 100vh;
 }
 
 a,
@@ -112,9 +118,9 @@ a,
     max-width: 48rem;
     margin: 0 auto 2rem;
     padding: 2rem;
-    border: 1px solid rgba(19, 34, 56, 0.08);
+    border: 1px solid rgba(151, 169, 193, 0.14);
     border-radius: 28px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(237, 244, 253, 0.88));
+    background: linear-gradient(135deg, rgba(17, 30, 49, 0.96), rgba(11, 20, 34, 0.92));
     box-shadow: var(--tracker-shadow);
 }
 
@@ -152,7 +158,7 @@ a,
     padding: 1.5rem;
     border: 3px solid transparent;
     border-radius: 26px;
-    background: var(--tracker-panel);
+    background: linear-gradient(180deg, rgba(18, 31, 51, 0.98), var(--tracker-panel-strong));
     box-shadow: var(--tracker-shadow);
 }
 
@@ -171,17 +177,17 @@ a,
 
 .podium-gold {
     border-color: var(--tracker-gold);
-    background: linear-gradient(180deg, rgba(255, 248, 221, 0.95), rgba(255, 255, 255, 0.95));
+    background: linear-gradient(180deg, rgba(71, 55, 18, 0.82), rgba(18, 31, 51, 0.98));
 }
 
 .podium-silver {
     border-color: var(--tracker-silver);
-    background: linear-gradient(180deg, rgba(241, 246, 250, 0.98), rgba(255, 255, 255, 0.95));
+    background: linear-gradient(180deg, rgba(44, 55, 70, 0.9), rgba(18, 31, 51, 0.98));
 }
 
 .podium-bronze {
     border-color: var(--tracker-bronze);
-    background: linear-gradient(180deg, rgba(252, 238, 227, 0.98), rgba(255, 255, 255, 0.95));
+    background: linear-gradient(180deg, rgba(66, 40, 29, 0.9), rgba(18, 31, 51, 0.98));
 }
 
 .podium-place {
@@ -202,8 +208,9 @@ a,
 }
 
 .player-chip {
-    background: rgba(19, 34, 56, 0.08);
-    color: var(--tracker-text);
+    background: rgba(151, 169, 193, 0.14);
+    color: #f5f8ff;
+    border: 1px solid rgba(151, 169, 193, 0.12);
 }
 
 .score-actions {
@@ -216,10 +223,11 @@ a,
 .score-button {
     min-height: 3rem;
     border-radius: 16px;
-    background: linear-gradient(135deg, #123d67, #2d6b9f);
+    background: linear-gradient(135deg, #174a76, #2d7eb8);
     color: #f7fbff;
     font-size: 1rem;
     font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .empty-state {
@@ -227,6 +235,8 @@ a,
     margin: 5rem auto;
     border-radius: 28px;
     text-align: center;
+    background: linear-gradient(180deg, rgba(17, 30, 49, 0.96), rgba(11, 20, 34, 0.92));
+    color: var(--tracker-text);
 }
 
 @media (max-width: 960px) {

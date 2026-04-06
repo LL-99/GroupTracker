@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider />
+<MudThemeProvider Theme="_theme" IsDarkMode="true" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -16,3 +16,21 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+@code {
+    private readonly MudTheme _theme = new()
+    {
+        PaletteDark = new PaletteDark
+        {
+            Background = "#08111f",
+            Surface = "#101d31",
+            AppbarBackground = "#0d1728",
+            DrawerBackground = "#0d1728",
+            TextPrimary = "#f4f7fb",
+            TextSecondary = "#9db0c8",
+            Primary = "#64b5f6",
+            Secondary = "#ffcc80",
+            Warning = "#f6c453"
+        }
+    };
+}
