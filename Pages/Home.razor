@@ -17,9 +17,9 @@ else
 	<section class="podium-grid">
 		@foreach (var group in GetPodiumSlots())
 		{
-			<MudPaper Class="@GetPodiumCardClass(group.Place)">
+			<MudPaper Class="@GetPodiumCardClass(group.Rank)">
 				<div class="podium-card-header">
-					<MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Place)</MudText>
+					<MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Rank)</MudText>
 					<div class="podium-card-header-actions">
 						@if (editingGroupId == group.Group.Id)
 						{
@@ -182,19 +182,36 @@ else
 
 	private List<PodiumSlot> GetPodiumSlots()
 	{
-		var slots = topGroups
-			.Select((entry, index) => new PodiumSlot(entry, index + 1))
-			.ToList();
+		var slots = new List<PodiumSlot>(topGroups.Count);
+		var currentRank = 0;
+		int? previousScore = null;
 
-		return slots
-			.OrderBy(slot => slot.Place switch
+		foreach (var entry in topGroups)
+		{
+			if (previousScore != entry.TotalScore)
 			{
-				2 => 0,
-				1 => 1,
-				3 => 2,
-				_ => slot.Place
-			})
-			.ToList();
+				currentRank++;
+				previousScore = entry.TotalScore;
+			}
+
+			slots.Add(new PodiumSlot(entry, currentRank));
+		}
+
+		var firstPlaceSlots = slots.Where(slot => slot.Rank == 1).ToList();
+		if (firstPlaceSlots.Count != 1)
+		{
+			return slots;
+		}
+
+		var leader = firstPlaceSlots[0];
+		var others = slots.Where(slot => slot != leader).ToList();
+
+		return
+		[
+			.. others.Take(1),
+			leader,
+			.. others.Skip(1)
+		];
 	}
 
 	private static string GetPlaceLabel(int place) => place switch
@@ -222,7 +239,7 @@ else
 
 	private static string FormatDelta(int delta) => delta > 0 ? $"+{delta}" : delta.ToString();
 
-	private sealed record PodiumSlot(GroupEntry Group, int Place);
+	private sealed record PodiumSlot(GroupEntry Group, int Rank);
 
 	public void Dispose()
 	{
