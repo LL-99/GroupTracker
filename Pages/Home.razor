@@ -93,6 +93,89 @@ else
 					</div>
 				</div>
 			</MudPaper>
+			}
+		</section>
+
+	<section class="ranked-list">
+		@foreach (var group in GetRankedSlots())
+		{
+			<MudPaper Class="@GetListCardClass(group.Rank)">
+				<div class="podium-card-header">
+					<MudText Typo="Typo.overline" Class="podium-place">@GetPlaceLabel(group.Rank)</MudText>
+					<div class="podium-card-header-actions">
+						@if (editingGroupId == group.Group.Id)
+						{
+							<MudIconButton Icon="@Icons.Material.Filled.Check"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@SaveGroupEditsAsync" />
+							<MudIconButton Icon="@Icons.Material.Filled.Close"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@CancelEdit" />
+						}
+						else
+						{
+							<MudIconButton Icon="@Icons.Material.Filled.Edit"
+										   Size="Size.Small"
+										   Color="Color.Inherit"
+										   Class="podium-edit-button"
+										   OnClick="@(() => StartEdit(group.Group))" />
+						}
+					</div>
+				</div>
+				<div class="ranked-list-summary">
+					@if (editingGroupId == group.Group.Id)
+					{
+						<MudTextField T="string"
+									  Value="@editGroupName"
+									  ValueChanged="@OnEditGroupNameChanged"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Class="podium-inline-input"
+									  Placeholder="Group name" />
+					}
+					else
+					{
+						<MudText Typo="Typo.h5" Class="podium-group-name">@group.Group.Name</MudText>
+					}
+					<MudText Typo="Typo.h5" Class="podium-score">@group.Group.TotalScore pts</MudText>
+				</div>
+				@if (editingGroupId == group.Group.Id)
+				{
+					<MudTextField T="string"
+								  Value="@editGroupMembers"
+								  ValueChanged="@OnEditGroupMembersChanged"
+								  Variant="Variant.Outlined"
+								  Margin="Margin.Dense"
+								  Class="podium-inline-input"
+								  Placeholder="Members, comma, separated" />
+				}
+				else
+				{
+					<MudChipSet T="string" AllClosable="false" Class="player-chip-list">
+						@foreach (var player in group.Group.PlayerNames)
+						{
+							<MudChip T="string" Class="player-chip">@player</MudChip>
+						}
+					</MudChipSet>
+				}
+				<div class="score-panel">
+					<MudText Typo="Typo.caption" Class="score-panel-label">Adjust score</MudText>
+					<div class="score-actions">
+						@foreach (var delta in scoreButtons)
+						{
+							<MudButton Variant="Variant.Filled"
+									   Class="@GetScoreButtonClass(delta)"
+									   OnClick="@(() => AdjustScoreAsync(group.Group.Id, delta))">
+								@FormatDelta(delta)
+							</MudButton>
+						}
+					</div>
+				</div>
+			</MudPaper>
 		}
 	</section>
 }
@@ -231,7 +314,7 @@ else
 		}
 	}
 
-	private List<PodiumSlot> GetPodiumSlots()
+	private List<PodiumSlot> GetRankedSlots()
 	{
 		var slots = new List<PodiumSlot>(groups.Count);
 		var currentRank = 0;
@@ -247,6 +330,13 @@ else
 
 			slots.Add(new PodiumSlot(entry, currentRank));
 		}
+
+		return slots;
+	}
+
+	private List<PodiumSlot> GetPodiumSlots()
+	{
+		var slots = GetRankedSlots();
 
 		var firstPlaceSlots = slots.Where(slot => slot.Rank == 1).ToList();
 		if (firstPlaceSlots.Count != 1)
@@ -279,6 +369,14 @@ else
 		2 => "podium-card podium-silver podium-second",
 		3 => "podium-card podium-bronze podium-third",
 		_ => "podium-card"
+	};
+
+	private static string GetListCardClass(int place) => place switch
+	{
+		1 => "ranked-list-card podium-gold",
+		2 => "ranked-list-card podium-silver",
+		3 => "ranked-list-card podium-bronze",
+		_ => "ranked-list-card"
 	};
 
 	private static string GetScoreButtonClass(int delta) => delta switch
