@@ -136,7 +136,9 @@ a,
 .podium-grid {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(3, minmax(0, 320px));
+    width: min(100%, 71rem);
+    margin: 0 auto;
+    grid-template-columns: repeat(3, minmax(0, 370px));
     justify-content: center;
     align-items: end;
 }
