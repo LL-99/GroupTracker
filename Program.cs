@@ -1,4 +1,4 @@
-using GroupTracking;
+using GroupTracker;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
