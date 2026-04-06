@@ -120,10 +120,10 @@ a,
 .podium-grid {
     display: grid;
     gap: 1.5rem;
-    width: min(100%, 71rem);
+    width: min(100%, 80rem);
     margin: 0 auto;
     padding: 2.5rem 0;
-    grid-template-columns: repeat(3, minmax(0, 400px));
+    grid-template-columns: repeat(3, minmax(0, 420px));
     justify-content: center;
     align-items: end;
 }
@@ -142,16 +142,16 @@ a,
 }
 
 .podium-first {
-    min-height: 32rem;
+    min-height: 36rem;
     transform: translateY(-1.5rem);
 }
 
 .podium-second {
-    min-height: 28rem;
+    min-height: 32rem;
 }
 
 .podium-third {
-    min-height: 24rem;
+    min-height: 28rem;
 }
 
 .podium-gold {
